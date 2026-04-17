@@ -1,55 +1,33 @@
-"""Production config — 12-Factor: tất cả từ environment variables."""
-import os
-import logging
-from dataclasses import dataclass, field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-@dataclass
-class Settings:
-    # Server
-    host: str = field(default_factory=lambda: os.getenv("HOST", "0.0.0.0"))
-    port: int = field(default_factory=lambda: int(os.getenv("PORT", "8000")))
-    environment: str = field(default_factory=lambda: os.getenv("ENVIRONMENT", "development"))
-    debug: bool = field(default_factory=lambda: os.getenv("DEBUG", "false").lower() == "true")
+class Settings(BaseSettings):
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
+    ENVIRONMENT: str = "development"
+    DEBUG: bool = True
 
-    # App
-    app_name: str = field(default_factory=lambda: os.getenv("APP_NAME", "Production AI Agent"))
-    app_version: str = field(default_factory=lambda: os.getenv("APP_VERSION", "1.0.0"))
+    APP_NAME: str = "AI Agent"
+    APP_VERSION: str = "1.0.0"
+    LOG_LEVEL: str = "INFO"
 
-    # LLM
-    openai_api_key: str = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))
-    llm_model: str = field(default_factory=lambda: os.getenv("LLM_MODEL", "gpt-4o-mini"))
+    OPENAI_API_KEY: str
+    LLM_MODEL: str = "gpt-4o-mini"
 
-    # Security
-    agent_api_key: str = field(default_factory=lambda: os.getenv("AGENT_API_KEY", "dev-key-change-me"))
-    jwt_secret: str = field(default_factory=lambda: os.getenv("JWT_SECRET", "dev-jwt-secret"))
-    allowed_origins: list = field(
-        default_factory=lambda: os.getenv("ALLOWED_ORIGINS", "*").split(",")
+    AGENT_API_KEY: str
+    JWT_SECRET: str
+
+    RATE_LIMIT_PER_MINUTE: int = 20
+    DAILY_BUDGET_USD: float = 5.0
+
+    REDIS_URL: str = "redis://localhost:6379/0"
+    ALLOWED_ORIGINS: str = "http://localhost:3000"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore"
     )
 
-    # Rate limiting
-    rate_limit_per_minute: int = field(
-        default_factory=lambda: int(os.getenv("RATE_LIMIT_PER_MINUTE", "20"))
-    )
 
-    # Budget
-    daily_budget_usd: float = field(
-        default_factory=lambda: float(os.getenv("DAILY_BUDGET_USD", "5.0"))
-    )
-
-    # Storage
-    redis_url: str = field(default_factory=lambda: os.getenv("REDIS_URL", ""))
-
-    def validate(self):
-        logger = logging.getLogger(__name__)
-        if self.environment == "production":
-            if self.agent_api_key == "dev-key-change-me":
-                raise ValueError("AGENT_API_KEY must be set in production!")
-            if self.jwt_secret == "dev-jwt-secret":
-                raise ValueError("JWT_SECRET must be set in production!")
-        if not self.openai_api_key:
-            logger.warning("OPENAI_API_KEY not set — using mock LLM")
-        return self
-
-
-settings = Settings().validate()
+settings = Settings()

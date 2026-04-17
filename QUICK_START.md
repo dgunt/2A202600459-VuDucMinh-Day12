@@ -58,6 +58,10 @@ curl http://localhost:8000/ask -X POST \
   -H "Content-Type: application/json" \
   -d '{"question": "Hello"}'
 ```
+OR
+```bash
+curl.exe -X POST "http://localhost:8000/ask?question=Hello"
+```
 
 **Expected:** You get a response! 🎉
 
@@ -70,7 +74,8 @@ cd ../../02-docker/develop
 
 # Build image
 docker build -t my-agent .
-
+OR
+docker build -t my-agent -f 02-docker/develop/Dockerfile .
 # Run container
 docker run -p 8000:8000 my-agent
 ```
@@ -80,6 +85,10 @@ Test again:
 curl http://localhost:8000/ask -X POST \
   -H "Content-Type: application/json" \
   -d '{"question": "What is Docker?"}'
+```
+OR
+```bash
+curl.exe -X POST -G --data-urlencode "question=What is Docker?" "http://localhost:8000/ask"
 ```
 
 **Expected:** Same response, but now in a container! 🐳
@@ -114,6 +123,11 @@ Test it:
 curl https://your-agent.railway.app/ask -X POST \
   -H "Content-Type: application/json" \
   -d '{"question": "Am I on the cloud?"}'
+OR
+Invoke-WebRequest -Uri "https://demo-production-c394.up.railway.app/ask" `
+  -Method POST `
+  -Headers @{ "Content-Type" = "application/json" } `
+  -Body '{"question":"Am I on the cloud?"}'
 ```
 
 **Expected:** Response from the cloud! 🌐
@@ -136,6 +150,7 @@ curl http://localhost:8000/ask -X POST \
   -H "Content-Type: application/json" \
   -d '{"question": "Hello"}'
 # Expected: 401 Unauthorized
+curl.exe -X POST -G --data-urlencode "question=Hello" "http://localhost:8000/ask"
 ```
 
 Test with key (should work):

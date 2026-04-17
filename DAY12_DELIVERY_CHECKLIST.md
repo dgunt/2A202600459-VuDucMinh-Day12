@@ -1,9 +1,10 @@
 #  Delivery Checklist — Day 12 Lab Submission
 
-> **Student Name:** _________________________  
-> **Student ID:** _________________________  
-> **Date:** _________________________
+> **Student Name:** Vũ Đức Minh
+> **Student ID:** 2A202600459
+> **Date:** 17/04/2026
 
+Link Deploy: https://ducminhapp-production.up.railway.app/
 ---
 
 ##  Submission Requirements
